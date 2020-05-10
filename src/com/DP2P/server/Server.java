@@ -1,6 +1,7 @@
 package com.DP2P.server;
 
 import com.DP2P.*;
+import com.DP2P.client.Client;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -39,6 +40,13 @@ public class Server extends Thread {
                         Pong pong = new Pong();
                         Node node = config.getMyNode();
                         ArrayList<FileInfo> arrayList = searchLocalFile(ping.getFileName(), node);
+                        if (arrayList.size() == 0 && ping.getTTL() > 0) {
+                            try {
+                                Client client = new Client();
+                                arrayList = client.findInServer(config, ping.getFileName(), ping.getTTL() - 1);
+                            } catch (Exception ignored) {
+                            }
+                        }
                         pong.setFileList(arrayList);
                         OutputStream outToServer = serverSocket.getOutputStream();
                         ObjectOutputStream out = new ObjectOutputStream(outToServer);
@@ -52,11 +60,12 @@ public class Server extends Thread {
                 input.close();
                 serverSocket.close();
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void sendFileToClient(Socket serverSocket, Ping ping) throws IOException {
         Path path = Path.of(config.getLocalPath().toString(), ping.getFileName());
         File myFile = path.toFile();

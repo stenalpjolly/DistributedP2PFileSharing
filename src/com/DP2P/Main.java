@@ -4,6 +4,7 @@ import com.DP2P.client.Client;
 import com.DP2P.server.Server;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class Main {
 
@@ -41,7 +42,15 @@ public class Main {
                         try {
                             String fileName = commands[1];
                             Client client = new Client();
-                            client.findInServer(config, fileName);
+                            ArrayList<FileInfo> fileInfos = client.findInServer(config, fileName, config.getTTL());
+                            config.setFiles(fileInfos);
+                            if (fileInfos.size() == 0) {
+                                System.out.println("No files found");
+                            } else {
+                                for (int index = 0; index < fileInfos.size(); index++) {
+                                    System.out.println("Index Id: " + index + ":" + fileInfos.get(index));
+                                }
+                            }
                         } catch (Exception e) {
                             System.out.println("Cannot find the file");
                         }

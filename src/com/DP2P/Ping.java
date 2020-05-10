@@ -7,6 +7,7 @@ public class Ping implements Serializable {
     public Node currentNode;
     private String fileName;
     private String command;
+    private int ttl;
 
     public Ping(Node node) {
         currentNode = node;
@@ -42,12 +43,21 @@ public class Ping implements Serializable {
         return Objects.hash(currentNode);
     }
 
+    public String getCommand() {
+        return command;
+    }
+
     public Ping setCommand(String command) {
         this.command = command;
         return this;
     }
 
-    public String getCommand() {
-        return command;
+    public int getTTL() {
+        return ttl;
+    }
+
+    public Ping setTTL(int ttl) {
+        this.ttl = ttl;
+        return this;
     }
 }

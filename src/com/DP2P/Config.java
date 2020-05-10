@@ -52,4 +52,8 @@ public class Config {
         this.files = files;
         return this;
     }
+
+    public int getTTL(){
+        return Integer.parseInt(this.properties.getProperty("TTL"));
+    }
 }
