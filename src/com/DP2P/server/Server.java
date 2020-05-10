@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class Server extends Thread {
@@ -15,8 +16,8 @@ public class Server extends Thread {
 
     public Server(Config config) throws IOException {
         serverSocket = new ServerSocket(0);
-        InetAddress inetAddress = InetAddress. getLocalHost();
-        config.setMyNode(new Node(inetAddress.getHostName(), serverSocket.getLocalPort()));
+        InetAddress inetAddress = InetAddress.getLocalHost();
+        config.setMyNode(new Node(inetAddress.getHostAddress(), serverSocket.getLocalPort()));
         this.config = config;
         System.out.println("Listening on port: " + this.config.getMyNode().port);
     }
@@ -45,6 +46,8 @@ public class Server extends Thread {
                         out.flush();
                         out.close();
                         break;
+                    case "download":
+                        sendFileToClient(serverSocket, ping);
                 }
                 input.close();
                 serverSocket.close();
@@ -52,6 +55,19 @@ public class Server extends Thread {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendFileToClient(Socket serverSocket, Ping ping) throws IOException {
+        Path path = Path.of(config.getLocalPath().toString(), ping.getFileName());
+        File myFile = path.toFile();
+
+        byte[] bytes = new byte[(int) myFile.length()];
+        FileInputStream inputStream = new FileInputStream(myFile);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+        bufferedInputStream.read(bytes, 0, bytes.length);
+        OutputStream os = serverSocket.getOutputStream();
+        os.write(bytes, 0, bytes.length);
+        os.flush();
     }
 
     public ArrayList<FileInfo> searchLocalFile(String filename, Node node){

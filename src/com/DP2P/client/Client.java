@@ -43,7 +43,31 @@ public class Client {
         client.close();
     }
 
-    public void downloadFile(FileInfo file) {
-        //TODO: Implement Download
+    public void downloadFile(FileInfo file) throws IOException {
+        Node node = file.getNode();
+        Socket client = new Socket(node.ip, node.port);
+        OutputStream outToServer = client.getOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(outToServer);
+        Ping ping = new Ping(node)
+                .setCommand("download")
+                .setFileName(file.getFileName());
+        out.writeObject(ping);
+        out.flush();
+        InputStream in = client.getInputStream();
+        OutputStream output = new FileOutputStream(file.getFileName());
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        System.out.println("Downloading");
+        int index = 0;
+        while ((bytesRead = in.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
+            if (index % 10 == 0) {
+                System.out.print(".");
+            }
+            index++;
+        }
+        output.close();
+        client.close();
+        System.out.println(" Done");
     }
 }
