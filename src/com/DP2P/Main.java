@@ -32,6 +32,7 @@ public class Main {
                         break;
                     case "close":
                         config.setServerNode(null);
+                        config.setFiles(null);
                         break;
                     case "info":
                         //TODO
@@ -44,10 +45,16 @@ public class Main {
                         } catch (Exception e) {
                             System.out.println("Cannot find the file");
                         }
-                        //TODO
                         break;
                     case "get":
-                        //TODO
+                        try{
+                            int fileId = Integer.parseInt(commands[1]);
+                            FileInfo file = config.getFiles().get(fileId);
+                            Client client = new Client();
+                            client.downloadFile(file);
+                        }catch (Exception e) {
+                            System.out.println("Cannot find the file");
+                        }
                         break;
                     default:
                         System.out.println("Usage:\n" +

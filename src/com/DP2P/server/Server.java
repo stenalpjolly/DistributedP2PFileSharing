@@ -1,25 +1,24 @@
 package com.DP2P.server;
 
-import com.DP2P.Config;
-import com.DP2P.Ping;
-import com.DP2P.Pong;
+import com.DP2P.*;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
 public class Server extends Thread {
 
-    int port;
     ServerSocket serverSocket;
     Config config;
 
     public Server(Config config) throws IOException {
         serverSocket = new ServerSocket(0);
-        this.port = serverSocket.getLocalPort();
+        InetAddress inetAddress = InetAddress. getLocalHost();
+        config.setMyNode(new Node(inetAddress.getHostName(), serverSocket.getLocalPort()));
         this.config = config;
-        System.out.println("Listening on port: " + this.port);
+        System.out.println("Listening on port: " + this.config.getMyNode().port);
     }
 
     @Override
@@ -37,7 +36,8 @@ public class Server extends Thread {
                         break;
                     case "search":
                         Pong pong = new Pong();
-                        ArrayList<String> arrayList = searchLocalFile(ping.getFileName());
+                        Node node = config.getMyNode();
+                        ArrayList<FileInfo> arrayList = searchLocalFile(ping.getFileName(), node);
                         pong.setFileList(arrayList);
                         OutputStream outToServer = serverSocket.getOutputStream();
                         ObjectOutputStream out = new ObjectOutputStream(outToServer);
@@ -54,15 +54,18 @@ public class Server extends Thread {
         }
     }
 
-    public ArrayList<String> searchLocalFile(String filename){
+    public ArrayList<FileInfo> searchLocalFile(String filename, Node node){
         File directoryObj = config.getLocalPath().toFile();
 
-        ArrayList<String> returnList = new ArrayList<>();
+        ArrayList<FileInfo> returnList = new ArrayList<>();
         String[] filesList = directoryObj.list();
         if (filesList != null) {
             for (String tempFileName : filesList) {
                 if (tempFileName.contains(filename)) {
-                    returnList.add(tempFileName);
+                    FileInfo fileInfo = new FileInfo()
+                            .setFileName(tempFileName)
+                            .setNode(node);
+                    returnList.add(fileInfo);
                 }
             }
         }

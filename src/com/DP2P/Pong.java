@@ -4,13 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Pong implements Serializable {
-    private ArrayList<String> fileList;
+    private ArrayList<FileInfo> fileList;
 
-    public ArrayList<String> getFileList() {
+    public ArrayList<FileInfo> getFileList() {
         return fileList;
     }
 
-    public void setFileList(ArrayList<String> fileList) {
+    public void setFileList(ArrayList<FileInfo> fileList) {
         this.fileList = fileList;
     }
 }

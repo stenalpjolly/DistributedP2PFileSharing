@@ -1,9 +1,6 @@
 package com.DP2P.client;
 
-import com.DP2P.Config;
-import com.DP2P.Node;
-import com.DP2P.Ping;
-import com.DP2P.Pong;
+import com.DP2P.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -35,8 +32,18 @@ public class Client {
         out.flush();
         ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
         Pong pong = (Pong) objectInputStream.readObject();
-        pong.getFileList()
-                .forEach(System.out::println);
+        config.setFiles(pong.getFileList());
+        if (pong.getFileList().size() == 0) {
+            System.out.println("No files found");
+        } else {
+            for (int index = 0; index < pong.getFileList().size(); index++) {
+                System.out.println("Index Id: " + index + ":" + pong.getFileList().get(index));
+            }
+        }
         client.close();
+    }
+
+    public void downloadFile(FileInfo file) {
+        //TODO: Implement Download
     }
 }
