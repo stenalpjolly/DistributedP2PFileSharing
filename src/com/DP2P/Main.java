@@ -42,7 +42,7 @@ public class Main {
                     case "info":
                         ArrayList<Node> nodes = config.getServerNodes();
                         for (int index = 0; index < nodes.size(); index++) {
-                            System.out.println("Id: " + index + ":" + nodes.get(index));
+                            System.out.println("Id:" + index + " :" + nodes.get(index));
                         }
                         break;
                     case "find":
@@ -55,7 +55,7 @@ public class Main {
                                 System.out.println("No files found");
                             } else {
                                 for (int index = 0; index < config.getFiles().size(); index++) {
-                                    System.out.println("Id: " + index + ":" + config.getFiles().get(index));
+                                    System.out.println("Id:" + index + " :" + config.getFiles().get(index));
                                 }
                             }
                         } catch (Exception e) {
