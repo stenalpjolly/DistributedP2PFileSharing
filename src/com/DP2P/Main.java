@@ -2,9 +2,7 @@ package com.DP2P;
 
 import com.DP2P.client.Client;
 import com.DP2P.server.Server;
-
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Main {
@@ -15,7 +13,6 @@ public class Main {
             Config config = new Config(args);
 
             new Server(config).start();
-            Client client = new Client();
 
             //noinspection InfiniteLoopStatement
             while(true){
@@ -24,20 +21,29 @@ public class Main {
                 switch (commands[0]) {
                     case "open":
                         try {
+                            Client client = new Client();
                             String[] options = commands[1].split(":");
                             Node node = new Node(options[0], Integer.parseInt(options[1]));
-                            client.connect(node);
+                            config.setServerNode(node);
+                            client.connect(config);
                         } catch (Exception e){
                             System.out.println("Invalid argument, Please refer help");
                         }
                         break;
                     case "close":
-                        //TODO
+                        config.setServerNode(null);
                         break;
                     case "info":
                         //TODO
                         break;
                     case "find":
+                        try {
+                            String fileName = commands[1];
+                            Client client = new Client();
+                            client.findInServer(config, fileName);
+                        } catch (Exception e) {
+                            System.out.println("Cannot find the file");
+                        }
                         //TODO
                         break;
                     case "get":
@@ -53,7 +59,7 @@ public class Main {
                                 "      get <id>          :download a file by id");
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Exception: Cannot find the configuration");
         }
     }
