@@ -1,6 +1,7 @@
 package com.DP2P;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class FileInfo implements Serializable {
     String fileName;
@@ -31,5 +32,19 @@ public class FileInfo implements Serializable {
                 ",IpAddress=" + node.ip +
                 ",Port=" + node.port +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FileInfo fileInfo = (FileInfo) o;
+        return Objects.equals(fileName, fileInfo.fileName) &&
+                Objects.equals(node, fileInfo.node);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fileName, node);
     }
 }

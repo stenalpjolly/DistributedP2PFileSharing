@@ -44,7 +44,8 @@ public class Server extends Thread {
                             try {
                                 Client client = new Client();
                                 arrayList = client.findInServer(config, ping.getFileName(), ping.getTTL() - 1);
-                            } catch (Exception ignored) {
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         }
                         pong.setFileList(arrayList);
@@ -83,12 +84,12 @@ public class Server extends Thread {
         File directoryObj = config.getLocalPath().toFile();
 
         ArrayList<FileInfo> returnList = new ArrayList<>();
-        String[] filesList = directoryObj.list();
+        File[] filesList = directoryObj.listFiles();
         if (filesList != null) {
-            for (String tempFileName : filesList) {
-                if (tempFileName.contains(filename)) {
+            for (File file : filesList) {
+                if (!file.isDirectory() && file.getName().contains(filename)) {
                     FileInfo fileInfo = new FileInfo()
-                            .setFileName(tempFileName)
+                            .setFileName(file.getName())
                             .setNode(node);
                     returnList.add(fileInfo);
                 }

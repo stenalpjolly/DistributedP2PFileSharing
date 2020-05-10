@@ -25,18 +25,25 @@ public class Main {
                             Client client = new Client();
                             String[] options = commands[1].split(":");
                             Node node = new Node(options[0], Integer.parseInt(options[1]));
-                            config.setServerNode(node);
-                            client.connect(config);
+                            config.addNewServer(node);
+                            client.connect(node);
                         } catch (Exception e){
                             System.out.println("Invalid argument, Please refer help");
                         }
                         break;
                     case "close":
-                        config.setServerNode(null);
-                        config.setFiles(null);
+                        try {
+                            int nodeId = Integer.parseInt(commands[1]);
+                            config.getServerNodes().remove(nodeId);
+                        } catch (Exception e) {
+                            System.out.println("Invalid argument, Please refer help");
+                        }
                         break;
                     case "info":
-                        //TODO
+                        ArrayList<Node> nodes = config.getServerNodes();
+                        for (int index = 0; index < nodes.size(); index++) {
+                            System.out.println("Id: " + index + ":" + nodes.get(index));
+                        }
                         break;
                     case "find":
                         try {
@@ -44,11 +51,11 @@ public class Main {
                             Client client = new Client();
                             ArrayList<FileInfo> fileInfos = client.findInServer(config, fileName, config.getTTL());
                             config.setFiles(fileInfos);
-                            if (fileInfos.size() == 0) {
+                            if (config.getFiles().size() == 0) {
                                 System.out.println("No files found");
                             } else {
-                                for (int index = 0; index < fileInfos.size(); index++) {
-                                    System.out.println("Index Id: " + index + ":" + fileInfos.get(index));
+                                for (int index = 0; index < config.getFiles().size(); index++) {
+                                    System.out.println("Id: " + index + ":" + config.getFiles().get(index));
                                 }
                             }
                         } catch (Exception e) {

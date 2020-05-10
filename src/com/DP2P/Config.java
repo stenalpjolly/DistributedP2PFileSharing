@@ -3,14 +3,16 @@ package com.DP2P;
 import java.io.FileReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 public class Config {
     Properties properties = new Properties();
-    private Node serverNode;
+    private ArrayList<Node> serverNodes = new ArrayList<>();
     private Node myNode;
 
-    private ArrayList<FileInfo> files;
+    private Set<FileInfo> files;
 
     Config(String[] args) throws Exception {
         if (args[0] == null) {
@@ -26,12 +28,12 @@ public class Config {
         return Path.of(properties.getProperty("localDir"));
     }
 
-    public Node getServerNode() {
-        return serverNode;
+    public ArrayList<Node> getServerNodes() {
+        return serverNodes;
     }
 
-    public Config setServerNode(Node serverNode) {
-        this.serverNode = serverNode;
+    public Config addNewServer(Node serverNode) {
+        serverNodes.add(serverNode);
         return this;
     }
 
@@ -45,11 +47,11 @@ public class Config {
     }
 
     public ArrayList<FileInfo> getFiles() {
-        return files;
+        return new ArrayList<>(files);
     }
 
     public Config setFiles(ArrayList<FileInfo> files) {
-        this.files = files;
+        this.files = new HashSet<>(files);
         return this;
     }
 

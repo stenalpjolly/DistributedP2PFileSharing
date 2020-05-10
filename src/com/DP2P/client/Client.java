@@ -8,8 +8,7 @@ import java.util.ArrayList;
 
 public class Client {
 
-    public void connect(Config config) throws IOException {
-        Node node = config.getServerNode();
+    public void connect(Node node) throws IOException {
         Socket client = new Socket(node.ip, node.port);
         System.out.println("Just connected to " + client.getRemoteSocketAddress());
         OutputStream outToServer = client.getOutputStream();
@@ -22,20 +21,25 @@ public class Client {
     }
 
     public ArrayList<FileInfo> findInServer(Config config, String fileName, int ttlValue) throws IOException, ClassNotFoundException {
-        Node node = config.getServerNode();
-        Socket client = new Socket(node.ip, node.port);
-        OutputStream outToServer = client.getOutputStream();
-        ObjectOutputStream out = new ObjectOutputStream(outToServer);
-        Ping ping = new Ping(node)
-                .setCommand("search")
-                .setTTL(ttlValue)
-                .setFileName(fileName);
-        out.writeObject(ping);
-        out.flush();
-        ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
-        Pong pong = (Pong) objectInputStream.readObject();
-        client.close();
-        return pong.getFileList();
+        ArrayList<Node> nodes = config.getServerNodes();
+        ArrayList<FileInfo> files = new ArrayList<>();
+        for (Node node : nodes) {
+            Socket client = new Socket(node.ip, node.port);
+            OutputStream outToServer = client.getOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(outToServer);
+            Ping ping = new Ping(node)
+                    .setCommand("search")
+                    .setTTL(ttlValue)
+                    .setFileName(fileName);
+            out.writeObject(ping);
+            out.flush();
+            ObjectInputStream objectInputStream = new ObjectInputStream(client.getInputStream());
+            Pong pong = (Pong) objectInputStream.readObject();
+            files.addAll(pong.getFileList());
+            client.close();
+        }
+
+        return files;
     }
 
     public void downloadFile(FileInfo file) throws IOException {
@@ -52,7 +56,7 @@ public class Client {
         OutputStream output = new FileOutputStream(file.getFileName());
         byte[] buffer = new byte[1024];
         int bytesRead;
-        System.out.println("Downloading");
+        System.out.println("Downloading: " + file.getFileName());
         int index = 0;
         while ((bytesRead = in.read(buffer)) != -1) {
             output.write(buffer, 0, bytesRead);
